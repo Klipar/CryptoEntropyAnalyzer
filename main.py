@@ -209,68 +209,55 @@ def get_numbers_tuple():
     return numbers
 
 
-def hello ():
-    print(colors.BEIGE + """
- _____      _                           _____                                 
-|  ___|    | |                         /  ___|                                
-| |__ _ __ | |_ _ __ ___  _ __  _   _  \\ `--.  ___ __ _ _ __  _ __   ___ _ __ 
-|  __| '_ \\| __| '__/ _ \\| '_ \\| | | |  `--. \\/ __/ _` | '_ \\| '_ \\ / _ \\ '__|
-| |__| | | | |_| | | (_) | |_) | |_| | /\\__/ / (_| (_| | | | | | | |  __/ |   
-\\____/_| |_|\\__|_|  \\___/| .__/ \\__, | \\____/ \\___\\__,_|_| |_|_| |_|\\___|_|   
-                         | |     __/ |                                        
-                         |_|    |___/                                         
-    
-"""+ colors.END)
+
+def main ():
+
+    result = "Result/"
+    if not os.path.exists(result):
+        os.makedirs(result)
+
+    # Check if the argument was passed. Request it if the argument is not provided.
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+        inform(f"Scaning file: {filename}")
+    else:
+        inform("Please, enter file name: ", end = "")
+        filename = input()
+
+    inform("Enter bach size in bites (1, 2, 4 or 8): ", end="")
+    num_bytes = int(input())
+
+    linked_list = read_bytes_from_file(filename, num_bytes)
+
+    success("Readed succesfuly!")
+    # Сортуємо список
+    inform ("Sorting...")
+    linked_list.sort()
+    success("Sorted succesfully!")
+    # Виводимо відсортовані значення
+    # print(linked_list.get_frequencies())
+    inform ("Creating text file...")
+    save_frequencies_to_file(linked_list, (result+filename+"_text_report"+".txt"))
+    success(f"Creating succesfully as: {result+filename}_text_report.txt!")
 
 
+    inform("Use castom graph size? (Yes/No): ", end = "")
+    castom_size = input().lower()
+    if (castom_size == "yes" or castom_size == 'y'):
+        # Виводимо значення зв'язаного списку
+        inform ("Enter your size (x, y):", end = "")
+        s = get_numbers_tuple()
+        inform ("Creating graph file...")
+        plot_frequencies(linked_list, filename = (result+filename+f"_report_{s}_graph"+".png"), size = s)
+        success("Creating and sawing succesfully!")
 
-hello()
+    else:
+        # Виводимо значення зв'язаного списку
+        inform ("Creating graph file...")
+        plot_frequencies(linked_list, filename = (result+filename+"_report_graph"+".png"))
+        plot_frequencies(linked_list, filename = (result+filename+"_Detalied_report_graph"+".png"), size = (40, 35))
+        success("Creating and sawing succesfully!")
 
-result = "Result/"
-if not os.path.exists(result):
-    # Якщо папка не існує, створюємо її
-    os.makedirs(result)
-
-# Перевіряємо, чи був переданий аргумент
-if len(sys.argv) > 1:
-    filename = sys.argv[1]
-    inform(f"Scaning file: {filename}")
-else:
-    inform("Please, enter file name: ", end = "")
-    filename = input()
-# Виклик функції з файлом і кількістю байтів
-# filename = '1'  # Задайте назву вашого файлу
-inform("Enter bach size in bites (1, 2, 4 or 8): ", end="")
-num_bytes = int(input())
-# num_bytes = 1
-linked_list = read_bytes_from_file(filename, num_bytes)
-success("Readed succesfuly!")
-# Сортуємо список
-inform ("Sorting...")
-linked_list.sort()
-success("Sorted succesfully!")
-# Виводимо відсортовані значення
-# print(linked_list.get_frequencies())
-inform ("Creating text file...")
-save_frequencies_to_file(linked_list, (result+filename+"_text_report"+".txt"))
-success(f"Creating succesfully as: {result+filename}_text_report.txt!")
-
-
-inform("Use castom graph size? (Yes/No): ", end = "")
-castom_size = input().lower()
-if (castom_size == "yes" or castom_size == 'y'):
-    # Виводимо значення зв'язаного списку
-    inform ("Enter your size (x, y):", end = "")
-    s = get_numbers_tuple()
-    inform ("Creating graph file...")
-    plot_frequencies(linked_list, filename = (result+filename+f"_report_{s}_graph"+".png"), size = s)
-    success("Creating and sawing succesfully!")
-
-else:
-    # Виводимо значення зв'язаного списку
-    inform ("Creating graph file...")
-    plot_frequencies(linked_list, filename = (result+filename+"_report_graph"+".png"))
-    plot_frequencies(linked_list, filename = (result+filename+"_Detalied_report_graph"+".png"), size = (40, 35))
-    success("Creating and sawing succesfully!")
-
-
+if __name__ == "__main__":
+    hello()
+    main ()
