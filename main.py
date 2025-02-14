@@ -191,41 +191,30 @@ def plot_frequencies(linked_list, filename='frequency_plot.png', size = (12, 8))
     plt.close()  # Закриваємо графік, щоб звільнити пам'ять
 
     success(f"Saves to: {filename}")
-def save_frequencies_to_file(linked_list, filename='frequencies_sorted.txt'):
-    """Зберігає частоти значень у файл з деталізацією найрідше і найчастіше зустрічаних значень."""
-    frequencies = linked_list.get_frequencies()
-    
-    # Знаходимо мінімальну і максимальну кількість зустрічань
-    min_count = min(frequencies.values())
-    max_count = max(frequencies.values())
-    
-    min_values = [value for value, count in frequencies.items() if count == min_count]
-    max_values = [value for value, count in frequencies.items() if count == max_count]
-    
-    # Обчислення середнього арифметичного
+
+def save_frequencies_to_file(frequencies: dict, filename: str) -> None:
+    """Saves the frequencies of values to a file detailing the least frequent and most frequent values."""
+
+    # Find the minimum and maximum number of meetings
+    min_value, min_count = next(iter(frequencies.items()))
+    max_value, max_count = next(reversed(frequencies.items()))
+
+    # Calculating the arithmetic mean
     total_count = sum(frequencies.values())
     average_count = total_count / len(frequencies) if frequencies else 0
 
     with open(filename, 'w') as f:
-        # Записуємо найрідше зустрічані значення
-        f.write("Least Common Values:\n")
-        for value in min_values:
-            f.write(f"Values: {value}, qty: {min_count}\n")
+        # Record the rarest and most frequent values
+        f.write(f"Least and Most frequent Values:\nValues: {min_value}, qty: {min_count}\n")
+        f.write(f"Values: {max_value}, qty: {max_count}\n\n")
         
-        # Записуємо найчастіше зустрічані значення
-        f.write("\nMost Common Values:\n")
-        for value in max_values:
-            f.write(f"Values: {value}, qty: {max_count}\n")
-        
-        # Різниця між мінімальним і максимальним значенням
+        # The difference between the minimum and maximum value, in the context of the number of repetitions
         difference = max_count - min_count
-        f.write(f"\nDifference Between Least Common and Most Frequently Encountered Values: \n===> {difference}\n")
         
-        f.write(f"\nThe difference between the least and most frequently encountered values as a percentage of the largest: \n===> {(100/max_count)*difference} %\n")
-
-        f.write(f"\nThe difference between the least and most frequently encountered values as a percentage of the mean: \n===> {(100/average_count)*difference} %\n")
+        f.write(f"Distance delta between the frequency \nof occurrence of the rarest and most frequent values: \n===> {difference}\n")
+        f.write(f"Distance delta between the frequency \nof occurrence of the rarest and most frequent values \nas a \npercentage of the largest: \n===> {(100/max_count)*difference} %\n")
+        f.write(f"Distance delta between the frequency \nof occurrence of the rarest and most frequent values \nas a percentage of the mean: \n===> {round((100/average_count)*difference, 4)} %\n")
         
-        # f.write(f"Maximum number of appointments: {}")
         f.write(f"\n{'Values':<15}{'Frequency':<15}\n")
         f.write("-" * 30 + "\n")
         for value, count in frequencies.items():
