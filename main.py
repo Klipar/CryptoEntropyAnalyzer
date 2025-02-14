@@ -214,8 +214,12 @@ def main ():
 
     result = "Result/"
     if not os.path.exists(result):
-        os.makedirs(result)
-
+        try:
+            os.makedirs(result)
+        except:
+            failed("Failed to create a directory to save the result in the current directory.")
+            sys.exit(1)
+    
     # Check if the argument was passed. Request it if the argument is not provided.
     if len(sys.argv) > 1:
         filename = sys.argv[1]
@@ -224,8 +228,16 @@ def main ():
         inform("Please, enter file name: ", end = "")
         filename = input()
 
+    if not os.path.isfile(filename):
+        failed("No such file was found in this directory. You may need to specify the full path.")
+        sys.exit(1)
+
     inform("Enter bach size in bites (1, 2, 4 or 8): ", end="")
-    num_bytes = int(input())
+    try:
+        num_bytes = int(input())
+    except:
+        failed("It must be a number (1, 2, 4 or 8)!")
+        sys.exit(1)
 
     linked_list = read_bytes_from_file(filename, num_bytes)
 
