@@ -84,57 +84,70 @@ class LinkedList:
         # Оновлюємо голову списку
         self.head = merge_sort(self.head)
 
-def read_bytes_from_file(filename, num_bytes):
+def Read_bytes_bucket (file, bytes_per_value, value_count, format_char):
+    # the function misses all checks to increase the reading speed
+    bytes_data = file.read(bytes_per_value)
+    value = struct.unpack(format_char, bytes_data)[0]
+    value_count[value] += 1
+    return (bytes_data, value)
+
+def read_bytes_from_file(filename: str, num_bytes: str) -> dict:
+    """_summary_
+
+    Args:
+        filename (str): name of the file to be scanned
+        num_bytes (str): Number of bytes to be scanned must be in (1, 2, 4, 8)
+
+    Raises:
+        ValueError: The number of bytes must be at least 1!
+        ValueError: Only 1, 2, 4, or 8 bytes are supported.
+
+    Returns:
+        dict: _description_
+    """
     if num_bytes < 1:
-        raise ValueError("Кількість байтів повинна бути не менше 1.")
+        raise ValueError("The number of bytes must be at least 1!")
     
-    # Визначаємо формат на основі кількості байтів
+    # Determine the format based on the number of bytes
     if num_bytes == 1:
-        format_char = 'B'  # 8-бітне беззнакове ціле
+        format_char = 'B'  # 8-bit unsigned integer
     elif num_bytes == 2:
-        format_char = 'H'  # 16-бітне беззнакове ціле
+        format_char = 'H'  # 16-bit unsigned integer
     elif num_bytes == 4:
-        format_char = 'I'  # 32-бітне беззнакове ціле
+        format_char = 'I'  # 32-bit unsigned integer
     elif num_bytes == 8:
-        format_char = 'Q'  # 64-бітне беззнакове ціле
+        format_char = 'Q'  # 64-bit unsigned integer
     else:
-        raise ValueError("Підтримуються лише 1, 2, 4 або 8 байтів.")
+        raise ValueError("Only 1, 2, 4, or 8 bytes are supported.")
 
-    bytes_per_value = struct.calcsize(format_char)  # Кількість байтів, необхідна для формату
-    value_count = defaultdict(int)  # Словник для підрахунку зустрічей значень
-
-    with open(filename, 'rb') as file:
-        inform ("Show bar, it make proces slover? (Yes/No): ", end = "")
-        show_bat = input().lower()
-        if (show_bat == "yes" or show_bat == 'y'):
-            val = (int(os.path.getsize(filename))/num_bytes)
-            bar = LineProgresBar (MaxLength = 50, text = "Scaning", maxWalue = val, isShowPersent = True,  isShowWalue = True)
-        while True:
+    bytes_per_value = struct.calcsize(format_char)
+    value_count = defaultdict(int) # a dictionary for counting meetings
+    try:
+        with open(filename, 'rb') as file:
+            inform ("Show bar, it make proces slover? (Yes/No): ", end = "")
+            show_bat = input().lower()
             if (show_bat == "yes" or show_bat == 'y'):
-                bar.ShoveAndUpdate (isreturn = False)
-            # Читаємо задану кількість байтів
-            bytes_data = file.read(bytes_per_value)
-            if len(bytes_data) < bytes_per_value:
-                # Якщо прочитано менше, ніж потрібно, виходимо з циклу
-                if (show_bat == "yes" or show_bat == 'y'):
+                val = (int(os.path.getsize(filename))/num_bytes)
+                bar = LineProgresBar (MaxLength = 50, text = "Scaning", maxWalue = val, isShowPersent = True,  isShowWalue = True)
+
+                while True: # I used 2 cycles to speed up the processing of large files
+                    bytes_data, value = Read_bytes_bucket (file, bytes_per_value, value_count, format_char)
+                    bar.ShoveAndUpdate (isreturn = False)
                     print(f'  [{value:0{bytes_per_value * 8}b}]', end="\r") 
-                break
-            
-            # Перетворюємо байти у значення
-            if num_bytes in [1, 2, 4, 8]:
-                value = struct.unpack(format_char, bytes_data)[0]
-                value_count[value] += 1
-                if (show_bat == "yes" or show_bat == 'y'):
-                    print(f'  [{value:0{bytes_per_value * 8}b}]', end="\r") 
-            
-    
-    # Створюємо зв'язаний список
-    linked_list = LinkedList()
-    for value, count in value_count.items():
-        linked_list.append(value, count)
-    if (show_bat == "yes" or show_bat == 'y'):
-        print()
-    return linked_list
+                    
+                    if len(bytes_data) < bytes_per_value:
+                        print()
+                        break
+            else:
+                while True:
+                    bytes_data = Read_bytes_bucket (file, bytes_per_value, value_count, format_char)
+
+                    if len(bytes_data) < bytes_per_value:
+                        break
+            return value_count
+    except:
+        failed (f"could not open the file: {filename}")
+        sys.exit (1)
 
 def plot_frequencies(linked_list, filename='frequency_plot.png', size = (12, 8)):
     frequencies = linked_list.get_frequencies()
