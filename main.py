@@ -85,13 +85,31 @@ class LinkedList:
         self.head = merge_sort(self.head)
 
 def Read_bytes_bucket (file, bytes_per_value, value_count, format_char):
-    # the function misses all checks to increase the reading speed
-    bytes_data = file.read(bytes_per_value)
-    value = struct.unpack(format_char, bytes_data)[0]
-    value_count[value] += 1
-    return (bytes_data, value)
+    try: # the function misses all checks to increase the reading speed
+        bytes_data = file.read(bytes_per_value)
+        if bytes_data:
+            value = struct.unpack(format_char, bytes_data)[0]
+            value_count[value] += 1
+            return bytes_data, value
+        return bytes_data, 0
+    except Exception as e:
+        failed (f"Error while reading file: \n{e}")
 
-def read_bytes_from_file(filename: str, num_bytes: str) -> dict:
+def get_format_char(num_bytes: int) -> str:
+    """Determine the format character based on the number of bytes."""
+    format_mapping = {
+        1: 'B',  # 8-bit unsigned integer
+        2: 'H',  # 16-bit unsigned integer
+        4: 'I',  # 32-bit unsigned integer
+        8: 'Q'   # 64-bit unsigned integer
+    }
+    
+    if num_bytes in format_mapping:
+        return format_mapping[num_bytes]
+    else:
+        raise ValueError(f"Unsupported number of bytes: {num_bytes}. Only 1, 2, 4, or 8 bytes are supported.")
+
+def read_bytes_from_file(filename: str, format_char: str, num_bytes: int) -> dict:
     """_summary_
 
     Args:
@@ -140,7 +158,7 @@ def read_bytes_from_file(filename: str, num_bytes: str) -> dict:
                         break
             else:
                 while True:
-                    bytes_data = Read_bytes_bucket (file, bytes_per_value, value_count, format_char)
+                    bytes_data, value = Read_bytes_bucket (file, bytes_per_value, value_count, format_char)
 
                     if len(bytes_data) < bytes_per_value:
                         break
