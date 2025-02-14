@@ -266,23 +266,20 @@ def main ():
     inform("Enter bach size in bites (1, 2, 4 or 8): ", end="")
     try:
         num_bytes = int(input())
-        if (num_bytes not in [1, 2, 4, 8]):
-            raise("input error!")
+        format_char = get_format_char(num_bytes)
     except:
         failed("It must be a number (1, 2, 4 or 8)!")
         sys.exit(1)
-
-    linked_list = read_bytes_from_file(filename, num_bytes)
-
+    
+    values = read_bytes_from_file(filename, format_char, num_bytes)
     success("Readed succesfuly!")
-    # Сортуємо список
+    
     inform ("Sorting...")
-    linked_list.sort()
+    values = dict(sorted(values.items(), key=lambda item: item[1])) # sorted from smallest to largest
     success("Sorted succesfully!")
-    # Виводимо відсортовані значення
-    # print(linked_list.get_frequencies())
+    
     inform ("Creating text file...")
-    save_frequencies_to_file(linked_list, (result+filename+"_text_report"+".txt"))
+    save_frequencies_to_file(values, (result+filename+"_text_report"+".txt"))
     success(f"Creating succesfully as: {result+filename}_text_report.txt!")
 
 
