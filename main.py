@@ -222,11 +222,16 @@ def save_frequencies_to_file(frequencies: dict, filename: str) -> None:
 
 
 def get_numbers_tuple():
-    input_string = input("")
-
-    numbers = tuple(map(int, input_string.split(',')))
-
-    return numbers
+    while 1:
+        inform ("Enter your size (x, y):", end = "")
+        input_string = input("")
+        try:
+            numbers = tuple(map(int, input_string.split(',')))
+            if numbers[0] < 0 or numbers[1] < 0:
+                raise ("Value erro. Some of the entered data is less than 0!")
+            return numbers
+        except:
+            failed ("Data entered incorrectly!\nThese must be 2 numbers greater than 0.")
 
 
 
@@ -271,12 +276,9 @@ def main ():
     save_frequencies_to_file(values, (result+filename+"_text_report"+".txt"))
     success(f"Creating succesfully as: {result+filename}_text_report.txt!")
 
-
     inform("Use castom graph size? (Yes/No): ", end = "")
     castom_size = input().lower()
     if (castom_size == "yes" or castom_size == 'y'):
-        # Виводимо значення зв'язаного списку
-        inform ("Enter your size (x, y):", end = "")
         s = get_numbers_tuple()
         inform ("Creating graph file...")
         plot_frequencies(linked_list, filename = (result+filename+f"_report_{s}_graph"+".png"), size = s)
