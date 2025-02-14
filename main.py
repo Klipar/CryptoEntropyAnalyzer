@@ -114,7 +114,8 @@ def read_bytes_from_file(filename: str, format_char: str, num_bytes: int) -> dic
 
     Args:
         filename (str): name of the file to be scanned
-        num_bytes (str): Number of bytes to be scanned must be in (1, 2, 4, 8)
+        format_char (str): format char (use func get_format_char() to it)
+        num_bytes (int): Number of bytes to be scanned must be in (1, 2, 4, 8)
 
     Raises:
         ValueError: The number of bytes must be at least 1!
@@ -123,26 +124,11 @@ def read_bytes_from_file(filename: str, format_char: str, num_bytes: int) -> dic
     Returns:
         dict: _description_
     """
-    if num_bytes < 1:
-        raise ValueError("The number of bytes must be at least 1!")
-    
-    # Determine the format based on the number of bytes
-    if num_bytes == 1:
-        format_char = 'B'  # 8-bit unsigned integer
-    elif num_bytes == 2:
-        format_char = 'H'  # 16-bit unsigned integer
-    elif num_bytes == 4:
-        format_char = 'I'  # 32-bit unsigned integer
-    elif num_bytes == 8:
-        format_char = 'Q'  # 64-bit unsigned integer
-    else:
-        raise ValueError("Only 1, 2, 4, or 8 bytes are supported.")
-
     bytes_per_value = struct.calcsize(format_char)
     value_count = defaultdict(int) # a dictionary for counting meetings
     try:
         with open(filename, 'rb') as file:
-            inform ("Show bar, it make proces slover? (Yes/No): ", end = "")
+            inform ("Show bar (it make proces slower)? (Yes/No): ", end = "")
             show_bat = input().lower()
             if (show_bat == "yes" or show_bat == 'y'):
                 val = (int(os.path.getsize(filename))/num_bytes)
@@ -167,28 +153,26 @@ def read_bytes_from_file(filename: str, format_char: str, num_bytes: int) -> dic
         failed (f"could not open the file: {filename}")
         sys.exit (1)
 
-def plot_frequencies(linked_list, filename='frequency_plot.png', size = (12, 8)):
-    frequencies = linked_list.get_frequencies()
-    
-    # Сортуємо значення за частотою (від найбільшої до найменшої)
+def plot_frequencies(frequencies: dict, filename: str = 'frequency_plot.png', size = (12, 8)):    
+    # Sort values by frequency (from highest to lowest)
     sorted_items = sorted(frequencies.items(), key=lambda x: x[1], reverse=True)
     values, counts = zip(*sorted_items)
 
-    # Створюємо графік
-    plt.figure(figsize=size)  # Збільшені розміри фігури
+    # Create a plot
+    plt.figure(figsize=size)  # Increased figure sizes
     plt.bar(range(len(values)), counts, tick_label=values, color='skyblue')
     plt.xlabel('Numbers')
-    plt.ylabel('Frequencys')
+    plt.ylabel('Frequencies')
     plt.title('File Entropy')
     
-    # Розміщуємо мітки на осі X так, щоб частоти відображались від найбільшої до найменшої
-    plt.xticks(rotation=90, ha='right')  # Повертаємо мітки на осі X для кращої читабельності і вирівнюємо по правому краю
+    # Place the labels on the X-axis so that the frequencies are displayed from highest to lowest
+    plt.xticks(rotation=90, ha='right')  # Rotate the labels on the X-axis for better readability and align them to the right edge
     plt.grid(axis='y')
 
-    # Зберігаємо графік у файл
-    plt.tight_layout()  # Автоматичне підлаштування розмірів, щоб уникнути накладання
+    # Save the graph to a file
+    plt.tight_layout()  # Automatic dimensional adjustment to avoid overlap
     plt.savefig(filename, format='png')
-    plt.close()  # Закриваємо графік, щоб звільнити пам'ять
+    plt.close()  # Close the chart to free up memory
 
     success(f"Saves to: {filename}")
 
@@ -281,14 +265,14 @@ def main ():
     if (castom_size == "yes" or castom_size == 'y'):
         s = get_numbers_tuple()
         inform ("Creating graph file...")
-        plot_frequencies(linked_list, filename = (result+filename+f"_report_{s}_graph"+".png"), size = s)
+        plot_frequencies(values, filename = (result+filename+f"_report_{s}_graph"+".png"), size = s)
         success("Creating and sawing succesfully!")
 
     else:
         # Виводимо значення зв'язаного списку
         inform ("Creating graph file...")
-        plot_frequencies(linked_list, filename = (result+filename+"_report_graph"+".png"))
-        plot_frequencies(linked_list, filename = (result+filename+"_Detalied_report_graph"+".png"), size = (40, 35))
+        plot_frequencies(values, filename = (result+filename+"_report_graph"+".png"))
+        plot_frequencies(values, filename = (result+filename+"_Detalied_report_graph"+".png"), size = (40, 35))
         success("Creating and sawing succesfully!")
 
 if __name__ == "__main__":
