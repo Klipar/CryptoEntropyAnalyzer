@@ -12,3 +12,15 @@ def hello ():
                          |_|    |___/                                         
     
 """+ colors.END)
+
+def get_numbers_tuple():
+    while 1:
+        inform ("Enter your size (x, y):", end = "")
+        input_string = input("")
+        try:
+            numbers = tuple(map(int, input_string.split(',')))
+            if numbers[0] < 0 or numbers[1] < 0:
+                raise ("Value erro. Some of the entered data is less than 0!")
+            return numbers
+        except:
+            failed ("Data entered incorrectly!\nThese must be 2 numbers greater than 0.")
