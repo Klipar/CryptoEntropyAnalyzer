@@ -4,7 +4,7 @@ from collections import defaultdict
 import sys
 from Easy.animations import *
 from Easy.massage import *
-
+from src.message import hello
 import os
 
 class Node:
@@ -248,6 +248,8 @@ def main ():
     inform("Enter bach size in bites (1, 2, 4 or 8): ", end="")
     try:
         num_bytes = int(input())
+        if (num_bytes not in [1, 2, 4, 8]):
+            raise("input error!")
     except:
         failed("It must be a number (1, 2, 4 or 8)!")
         sys.exit(1)
